@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Amount is <span id="total">0</span></h1>
+    <button onclick="increaseValue()">Up</button>
+    <button onclick="decreaseValue()">Down</button>
+    <p>Product Details: <span id="product-details"></span></p>
+    <script src="./dist/index.js"></script>
+    <script>
+        let product = reactive({
+            value: 5,
+            quantity: 3,
+        })
+        let total = 0
+
+        function increaseValue(){
+            product.value++
+        }
+
+        function decreaseValue() {
+            product.value--
+        }
+
+        effect(() => {
+            total = product.value * product.quantity
+            console.log("TRIGGER")
+            document.getElementById('total').textContent = total
+        })
+
+        effect(() => {
+            product
+            document.getElementById('product-details').textContent = JSON.stringify(product)
+        })
+    </script>
+</body>
+</html>
