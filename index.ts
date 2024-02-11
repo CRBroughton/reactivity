@@ -25,12 +25,12 @@ export function reactivity() {
 
     function reactive<T extends Object>(target: T) {
         const handler = {
-            get(target: T, key: string | symbol, receiver: any): ReturnType<typeof Reflect.get> {
+            get(target: T, key: string | symbol, receiver: T): ReturnType<typeof Reflect.get> {
                 const result = Reflect.get(target, key, receiver)
                 track(target, key)
                 return result
             },
-            set(target: T, key: string | symbol, value: T[keyof T], receiver: any): ReturnType<typeof Reflect.set> {
+            set(target: T, key: string | symbol, value: T[keyof T], receiver: T): ReturnType<typeof Reflect.set> {
                 const oldValue = target[key as keyof T]
                 const result = Reflect.set(target, key, value, receiver)
                 if (result && oldValue !== value) {
