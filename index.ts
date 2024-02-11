@@ -31,8 +31,11 @@ export function reactivity() {
                 return result
             },
             set(target: T, key: string | symbol, value: T[keyof T], receiver: any) {
+                const oldValue = target[key as keyof T]
                 const result = Reflect.set(target, key, value, receiver)
-                trigger(target, key)
+                if (result && oldValue !== value) {
+                    trigger(target, key)
+                }
                 return result
             },
         }
