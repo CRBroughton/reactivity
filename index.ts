@@ -3,8 +3,8 @@ export function reactivity() {
 
     // targetMap stores all of the dependencies
     // for each reactive object's properties
-    const targetMap = new WeakMap<Object, Map<string | symbol, Set<Function | null>>>()
-    function track<T extends Object>(target: T, key: string | symbol) {
+    const targetMap = new WeakMap<Object, Map<PropertyKey, Set<Function | null>>>()
+    function track<T extends Object>(target: T, key: PropertyKey) {
         // this dependency map stores dependencies
         // for each property in the targetMap
         let depsMap = targetMap.get(target)
@@ -20,7 +20,7 @@ export function reactivity() {
         dep.add(activeEffect)
     }
 
-    function trigger<T extends Object>(target: T, key: string | symbol) {
+    function trigger<T extends Object>(target: T, key: PropertyKey) {
         const depsMap = targetMap.get(target)
         if (!depsMap) { return }
         let dep = depsMap.get(key)
@@ -49,12 +49,12 @@ export function reactivity() {
         // This handler contains two 'traps', or overides for
         // the getter and setter of the proxied target object.
         const handler = {
-            get(target: T, key: string | symbol, receiver: T): ReturnType<typeof Reflect.get> {
+            get(target: T, key: PropertyKey, receiver: T): ReturnType<typeof Reflect.get> {
                 const result = Reflect.get(target, key, receiver)
                 track(target, key)
                 return result
             },
-            set(target: T, key: string | symbol, value: T[keyof T], receiver: T): ReturnType<typeof Reflect.set> {
+            set(target: T, key: PropertyKey, value: T[keyof T], receiver: T): ReturnType<typeof Reflect.set> {
                 const oldValue = target[key as keyof T]
                 const result = Reflect.set(target, key, value, receiver)
                 // Here we ensure that the trigger is only run if
