@@ -56,3 +56,9 @@ export function createEffect(fn: Effect): Effect {
   effect();
   return effect;
 }
+
+export function createMemo<T>(fn: () => T): Getter<T> {
+  const [value, setValue] = createSignal<T>(undefined as T);
+  createEffect(() => setValue(fn()));
+  return value;
+}

@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { createEffect, createSignal } from '../signals';
+import { createEffect, createMemo, createSignal } from '../signals';
 
 it('creates a signal with a starting value', () => {
   const [name] = createSignal('Craig');
@@ -37,7 +37,7 @@ it('effect runs when dependencies change', () => {
 
 it('effect runs only when tracked dependencies change', () => {
   const [count1, setCount1] = createSignal(0);
-  const [count2, setCount2] = createSignal(0);
+  const [_count2, setCount2] = createSignal(0);
   const fn = vi.fn(() => count1());
 
   createEffect(fn);
@@ -63,4 +63,47 @@ it('effect tracks multiple dependencies', () => {
 
   setLast('Earth');
   expect(fn).toHaveBeenCalledTimes(3);
+});
+
+it('creates a memo with initial computation', () => {
+  const [first] = createSignal('Hello');
+  const [last] = createSignal('World');
+  const fullName = createMemo(() => `${first()} ${last()}`);
+
+  expect(fullName()).toBe('Hello World');
+});
+
+it('memo updates when dependencies change', () => {
+  const [first, setFirst] = createSignal('Hello');
+  const [last, setLast] = createSignal('World');
+  const fullName = createMemo(() => `${first()} ${last()}`);
+
+  expect(fullName()).toBe('Hello World');
+
+  setFirst('Hi');
+  expect(fullName()).toBe('Hi World');
+
+  setLast('Earth');
+  expect(fullName()).toBe('Hi Earth');
+});
+
+it('memo caches value and avoids recomputation', () => {
+  const [count, setCount] = createSignal(0);
+  const compute = vi.fn(x => x * 2);
+  const doubled = createMemo(() => compute(count()));
+
+  // Initial computation
+  expect(doubled()).toBe(0);
+  expect(compute).toHaveBeenCalledTimes(1);
+
+  // Reading multiple times without changes
+  doubled();
+  doubled();
+  doubled();
+  expect(compute).toHaveBeenCalledTimes(1); // Still only one computation
+
+  // Update triggers recomputation
+  setCount(1);
+  expect(doubled()).toBe(2);
+  expect(compute).toHaveBeenCalledTimes(2);
 });
