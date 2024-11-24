@@ -107,3 +107,158 @@ it('memo caches value and avoids recomputation', () => {
   expect(doubled()).toBe(2);
   expect(compute).toHaveBeenCalledTimes(2);
 });
+
+it('creates a signal with an array value', () => {
+  const [items] = createSignal(['a', 'b', 'c']);
+  expect(items()).toEqual(['a', 'b', 'c']);
+});
+
+it('adds items to array', () => {
+  const [items, setItems] = createSignal<string[]>([]);
+  setItems(prev => [...prev, 'new item']);
+  expect(items()).toEqual(['new item']);
+});
+
+it('effects track array changes', () => {
+  const [items, setItems] = createSignal<string[]>([]);
+  const effectFn = vi.fn();
+
+  createEffect(() => {
+    items(); // Subscribe to changes
+    effectFn();
+  });
+
+  expect(effectFn).toHaveBeenCalledTimes(1);
+
+  setItems(['new item']);
+  expect(effectFn).toHaveBeenCalledTimes(2);
+  expect(items()).toEqual(['new item']);
+});
+
+it('supports array methods through setter function', () => {
+  const [items, setItems] = createSignal<string[]>(['a', 'b', 'c']);
+
+  // Push equivalent
+  setItems(prev => [...prev, 'd']);
+  expect(items()).toEqual(['a', 'b', 'c', 'd']);
+
+  // Filter equivalent
+  setItems(prev => prev.filter(item => item !== 'b'));
+  expect(items()).toEqual(['a', 'c', 'd']);
+
+  // Map equivalent
+  setItems(prev => prev.map(item => item.toUpperCase()));
+  expect(items()).toEqual(['A', 'C', 'D']);
+});
+
+it('effect updates when array length changes', () => {
+  const [items, setItems] = createSignal<string[]>([]);
+  const lengthFn = vi.fn();
+
+  createEffect(() => {
+    lengthFn(items().length);
+  });
+
+  expect(lengthFn).toHaveBeenLastCalledWith(0);
+
+  setItems(['item 1']);
+  expect(lengthFn).toHaveBeenLastCalledWith(1);
+
+  setItems(prev => [...prev, 'item 2']);
+  expect(lengthFn).toHaveBeenLastCalledWith(2);
+});
+
+it('effect updates when array items change', () => {
+  const [items, setItems] = createSignal<string[]>(['original']);
+  const effectFn = vi.fn();
+
+  createEffect(() => {
+    items().forEach(item => effectFn(item));
+  });
+
+  expect(effectFn).toHaveBeenLastCalledWith('original');
+
+  setItems(['updated']);
+  expect(effectFn).toHaveBeenLastCalledWith('updated');
+});
+
+it('multiple array operations in sequence', () => {
+  const [items, setItems] = createSignal<string[]>([]);
+  const effectFn = vi.fn();
+
+  createEffect(() => {
+    effectFn(items().length);
+  });
+
+  // Add items
+  setItems(prev => [...prev, 'item 1']);
+  setItems(prev => [...prev, 'item 2']);
+  expect(items()).toEqual(['item 1', 'item 2']);
+  expect(effectFn).toHaveBeenLastCalledWith(2);
+
+  // Remove an item
+  setItems(prev => prev.filter(item => item !== 'item 1'));
+  expect(items()).toEqual(['item 2']);
+  expect(effectFn).toHaveBeenLastCalledWith(1);
+
+  // Clear array
+  setItems([]);
+  expect(items()).toEqual([]);
+  expect(effectFn).toHaveBeenLastCalledWith(0);
+});
+
+it('array spread operations', () => {
+  const [items, setItems] = createSignal<string[]>(['a', 'b']);
+  const [items2] = createSignal<string[]>(['c', 'd']);
+
+  setItems(prev => [...prev, ...items2()]);
+  expect(items()).toEqual(['a', 'b', 'c', 'd']);
+});
+
+it('complex array operations with objects', () => {
+  interface Todo {
+    id: number;
+    text: string;
+    completed: boolean;
+  }
+
+  const [todos, setTodos] = createSignal<Todo[]>([]);
+
+  // Add todo
+  setTodos(prev => [...prev, { id: 1, text: 'Test', completed: false }]);
+  expect(todos()).toHaveLength(1);
+  expect(todos()[0]).toEqual({ id: 1, text: 'Test', completed: false });
+
+  // Update todo
+  setTodos(prev =>
+    prev.map(todo =>
+      todo.id === 1 ? { ...todo, completed: true } : todo,
+    ),
+  );
+  expect(todos()[0].completed).toBe(true);
+
+  // Remove todo
+  setTodos(prev => prev.filter(todo => todo.id !== 1));
+  expect(todos()).toHaveLength(0);
+});
+
+it('array mutations trigger effects exactly once', () => {
+  const [items, setItems] = createSignal<string[]>([]);
+  const effectFn = vi.fn();
+
+  createEffect(() => {
+    items(); // Subscribe to changes
+    effectFn();
+  });
+
+  expect(effectFn).toHaveBeenCalledTimes(1);
+
+  setItems((prev) => {
+    prev.push('item 1'); // Don't do this in real code!
+    prev.push('item 2'); // Multiple mutations
+    return prev;
+  });
+
+  // Should still only trigger once
+  expect(effectFn).toHaveBeenCalledTimes(2);
+});
