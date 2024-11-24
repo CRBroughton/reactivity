@@ -23,19 +23,19 @@ export function createSignal<T>(init: T): [Getter<T>, Setter<T>] {
 
   let value = init;
   const read = () => {
-    if (currentEffect) {
+    if (currentEffect)
       dependencies.add(currentEffect);
-    }
+
     return value;
   };
 
   const write = (newValue: T | ((prev: T) => T)) => {
-    if (typeof newValue === 'function') {
+    if (typeof newValue === 'function')
       value = (newValue as (prev: T) => T)(value);
-    }
-    else {
+
+    else
       value = newValue;
-    }
+
     dependencies.notify();
   };
 
