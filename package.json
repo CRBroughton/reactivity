@@ -1,15 +1,19 @@
 {
   "name": "reactivity",
-  "module": "index.ts",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "bun run build.ts"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "bun-plugin-dts": "^0.2.1"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@antfu/eslint-config": "^3.9.2",
+    "eslint": "^9.15.0",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.5"
   }
 }

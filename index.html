@@ -1,43 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Amount is <span id="total">0</span></h1>
-    <button onclick="increaseValue()">Up</button>
-    <button onclick="decreaseValue()">Down</button>
-    <p>Product Details: <span id="product-details"></span></p>
-    <script type="module" src="./dist/index.js"></script>
-    <script type="module">
-        import {reactivity} from './dist/index.js'
-        const {reactive, effect} = reactivity()
-        let product = reactive({
-            value: 5,
-            quantity: 3,
-        })
-        let total = 0
-
-        window.increaseValue = function(){
-            product.value++
-        }
-
-        window.decreaseValue = function(){
-            product.value--
-        }
-
-        effect(() => {
-            total = product.value * product.quantity
-            console.log("TRIGGER")
-            document.getElementById('total').textContent = total
-        })
-
-        effect(() => {
-            product
-            document.getElementById('product-details').textContent = JSON.stringify(product)
-        })
-    </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
