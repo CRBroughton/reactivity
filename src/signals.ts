@@ -1,7 +1,7 @@
-type Getter<T> = () => T;
-type Value<T> = T | ((previous: T) => T);
-type Setter<T> = (value: Value<T>) => void;
-type Effect = () => void;
+export type Getter<T> = () => T;
+export type Value<T> = T | ((previous: T) => T);
+export type Setter<T> = (value: Value<T>) => void;
+export type Effect = () => void;
 
 interface Dependencies {
   add: (effect: Effect) => void;
