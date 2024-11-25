@@ -37,15 +37,14 @@ function appendChild(element: HTMLElement, child: VNode) {
   if (child == null)
     return;
 
-  if (typeof child === 'function') {
+  if (typeof child === 'function')
     appendReactiveChild(element, child);
-  }
-  else if (isJSXElement(child)) {
+
+  else if (isJSXElement(child))
     element.appendChild(createComponent(child));
-  }
-  else {
+
+  else
     element.appendChild(document.createTextNode(String(child)));
-  }
 }
 
 function appendReactiveChild(element: HTMLElement, child: () => unknown) {
@@ -79,15 +78,14 @@ function isFunctionComponent(jsxElement: JSXElement): jsxElement is JSXElement &
   return typeof jsxElement.type === 'function';
 }
 function createComponent(jsxElement: JSXElement): HTMLElement | Text {
-  if (isHTMLComponent(jsxElement)) {
+  if (isHTMLComponent(jsxElement))
     return createHTMLElement(jsxElement);
-  }
-  else if (isFunctionComponent(jsxElement)) {
+
+  else if (isFunctionComponent(jsxElement))
     return createFunctionalComponent(jsxElement);
-  }
-  else {
+
+  else
     throw new Error('Invalid component type');
-  }
 }
 
 export function render(component: JSXElement, container: HTMLElement | null) {
