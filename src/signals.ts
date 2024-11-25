@@ -1,5 +1,6 @@
 type Getter<T> = () => T;
-type Setter<T> = (value: T | ((previous: T) => T)) => void;
+type Value<T> = T | ((previous: T) => T);
+type Setter<T> = (value: Value<T>) => void;
 type Effect = () => void;
 
 interface Dependencies {
@@ -29,7 +30,7 @@ export function createSignal<T>(init: T): [Getter<T>, Setter<T>] {
     return value;
   };
 
-  const write = (newValue: T | ((prev: T) => T)) => {
+  const write = (newValue: Value<T>) => {
     if (typeof newValue === 'function')
       value = (newValue as (prev: T) => T)(value);
 
