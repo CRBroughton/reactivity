@@ -2,6 +2,7 @@
 
 import { createElement } from '../dom';
 import { createSignal } from '../signals';
+import { Button } from './Button';
 
 export function Counter() {
   const [count, setCount] = createSignal(0);
@@ -11,18 +12,18 @@ export function Counter() {
       <h2 class="text-2xl font-bold text-gray-800">Counter Demo</h2>
       <div class="text-4xl font-bold text-indigo-600">{count}</div>
       <div class="flex gap-2">
-        <button
-          onClick={() => setCount(count => count - 1)}
-          class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600 transition-colors"
+        <Button
+          text="Decrement"
+          click={() => setCount(count => count - 1)}
         >
           -
-        </button>
-        <button
-          onClick={() => setCount(count => count + 1)}
-          class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600 transition-colors"
+        </Button>
+        <Button
+          text="Increment"
+          click={() => setCount(count => count + 1)}
         >
           +
-        </button>
+        </Button>
       </div>
     </div>
   );
