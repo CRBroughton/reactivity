@@ -1,3 +1,5 @@
+import { createEffect } from './signals';
+
 type Props = Record<string, unknown>;
 interface VNode {
   type: string;
@@ -20,25 +22,58 @@ type Children = (VNode | string)[];
 // }
 
 type Style = Partial<CSSStyleDeclaration | Record<string, PropertyKey>>;
-interface ElementProps {
+
+type EventHandlers = {
+  [K in keyof HTMLElementEventMap as `on${Capitalize<K>}`]?: (event: HTMLElementEventMap[K]) => void;
+};
+
+export interface ElementProps extends EventHandlers {
   style?: Style;
   class?: string;
   className?: string;
-  [key: PropertyKey]: any;
+  text?: string | (() => string);
+  children?: (HTMLElement | null | undefined)[];
+  [key: string]: any;
 };
-export function createElement(tag: string, props: ElementProps = {}): HTMLElement {
+
+export function createElement(tag: string, props: ElementProps = {}) {
   const element = document.createElement(tag);
 
-  if (props.className || props.class)
-    element.className = props.className || props.class || '';
+  const { style, class: className, text, children, ...otherProps } = props;
 
-  if (props.style)
-    Object.assign(element.style, props.style);
+  if (className)
+    element.className = className;
 
-  Object.entries(props).forEach(([key, value]) => {
-    if (key !== 'style' && key !== 'class' && key !== 'className')
+  if (style)
+    Object.assign(element.style, style);
+
+  if (text) {
+    if (typeof text === 'function') {
+      createEffect(() => {
+        element.textContent = text();
+      });
+    }
+    else {
+      element.textContent = text;
+    }
+  }
+
+  Object.entries(otherProps).forEach(([key, value]) => {
+    if (key.startsWith('on') && typeof value === 'function') {
+      const eventName = key.slice(2).toLowerCase();
+      element.addEventListener(eventName, value);
+    }
+    else {
       element.setAttribute(key, value);
+    }
   });
+
+  if (children) {
+    children.forEach((child) => {
+      if (child instanceof Node)
+        element.appendChild(child);
+    });
+  }
 
   return element;
 }

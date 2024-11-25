@@ -1,56 +1,82 @@
-import { createEffect, createSignal } from './signals';
-import typescriptLogo from './typescript.svg';
+import { createElement } from './dom';
+import { createSignal } from './signals';
 import './style.css';
-import viteLogo from '/vite.svg';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="decrement" type="button">-</button>
-      <span id="count"></span>
-      <button id="increment" type="button">+</button>
-    </div>
-    <div class="card">
-      <input id="nameInput" type="text" placeholder="Enter your name">
-      <div id="greeting"></div>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`;
+function Counter() {
+  const [count, setCount] = createSignal(0);
 
-const [count, setCount] = createSignal(0);
-createEffect(() => {
-  const countElement = document.querySelector('#count');
-  if (countElement) {
-    countElement.innerHTML = `Count is: ${count()}`;
-  }
-});
+  const decrementBtn = createElement('button', {
+    class: 'btn',
+    text: '-',
+    onclick: () => setCount(c => c - 1),
+  });
 
-document.querySelector('#increment')?.addEventListener('click', () => {
-  setCount(c => c + 1);
-});
-document.querySelector('#decrement')?.addEventListener('click', () => {
-  setCount(c => c - 1);
-});
+  const display = createElement('span', {
+    style: { margin: '0 16px', fontSize: '20px' },
+    text: () => count().toString(),
+  });
 
-const [name, setName] = createSignal('');
-createEffect(() => {
-  const greetingElement = document.querySelector('#greeting');
-  if (greetingElement) {
-    greetingElement.innerHTML = name()
-      ? `Hello, ${name()}!`
-      : 'Enter your name above';
-  }
-});
-document.querySelector('#nameInput')?.addEventListener('input', (e) => {
-  setName((e.target as HTMLInputElement).value);
-});
+  const incrementBtn = createElement('button', {
+    class: 'btn',
+    text: '+',
+    onclick: () => setCount(c => c + 1),
+  });
+
+  return createElement('div', {
+    class: 'card',
+    children: [decrementBtn, display, incrementBtn],
+  });
+}
+
+function NameInput() {
+  const [name, setName] = createSignal('');
+
+  const input = createElement('input', {
+    type: 'text',
+    placeholder: 'Enter your name',
+    style: {
+      padding: '8px',
+      marginRight: '8px',
+      borderRadius: '4px',
+      border: '1px solid #ddd',
+    },
+    oninput: event => setName(event.target && event.target.value),
+  });
+
+  const greeting = createElement('div', {
+    text: () => name() ? `Hello, ${name()}!` : '',
+    style: { marginTop: '8px' },
+  });
+
+  return createElement('div', {
+    class: 'card',
+    children: [input, greeting],
+  });
+}
+
+function App() {
+  const title = createElement('h1', { text: 'Interactive Demo' });
+  const description = createElement('p', {
+    text: 'Try out these interactive components:',
+  });
+
+  const counterTitle = createElement('h2', { text: 'Counter' });
+  const counter = Counter();
+
+  const nameTitle = createElement('h2', { text: 'Name Input' });
+  const nameInput = NameInput();
+
+  return createElement('div', {
+    class: 'container',
+    children: [
+      title,
+      description,
+      counterTitle,
+      counter,
+      nameTitle,
+      nameInput,
+    ],
+  });
+}
+
+document.getElementById('app')?.appendChild(App());
