@@ -1,5 +1,4 @@
 /** @jsx createElement */
-
 import { createElement } from '../dom';
 import { createSignal } from '../signals';
 
