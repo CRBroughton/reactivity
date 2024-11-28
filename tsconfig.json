@@ -2,24 +2,20 @@
   "compilerOptions": {
     "target": "ES2020",
     "jsx": "preserve",
-    "jsxFactory": "h",
+    "jsxFactory": "createElement",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-
     "moduleDetection": "force",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    /* Bundler mode */
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
-
-    /* Linting */
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "skipLibCheck": true,
     "noEmit": true,
     "isolatedModules": true,
+    "skipLibCheck": true,
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"]

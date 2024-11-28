@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx createElement */
-
 import { Counter } from './components/Counter';
 import { Input } from './components/Input';
 import { createElement, render } from './dom';

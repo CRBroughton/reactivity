@@ -1,5 +1,3 @@
-/** @jsx createElement */
-
 import { createElement } from '../dom';
 
 interface ButtonProps {
